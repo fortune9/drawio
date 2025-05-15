@@ -1,0 +1,127 @@
+---
+title: "How to use draw.io to make flow charts"
+author: "Zhenguo Zhang"
+date: "`r Sys.Date()`"
+output:
+    github_document:
+        toc: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Background
+
+More often, I need to create flow charts to illustrate the workflow of my research. This process
+is actually quite tedious, especially when I need to update the flow chart frequently.
+
+Recently, I did some research and found that draw.io is a great candidate to smooth this process;
+moreover, it is free and open-source, has both local desktop and web versions. It also has command
+line support, which is very useful for me to automate the process of creating flow charts.
+
+
+## Install draw.io desktop
+
+Essentially the draw.io drawio-desktop is a diagramming desktop app based on Electron that wraps the core draw.io editor.
+
+### MacOS
+
+```bash
+brew install drawio --cask
+```
+
+The command line version is located at `/Applications/draw.io.app/Contents/MacOS/draw.io`.
+
+### Linux
+
+```bash
+sudo snap install drawio
+```
+
+Check [this post](https://linuxcapable.com/how-to-install-draw-io-on-ubuntu-linux/) for more details
+and alternative solutions.
+
+Note that the snap version may not work; in this case, installing from .deb or rpm files are
+recommended.
+
+### Windows
+
+One can download the installer from [here](https://github.com/jgraph/drawio-desktop/releases).
+
+
+## Use draw.io
+
+### CSV input format
+
+In addition to drawing flow charts manually, draw.io also supports CSV input format. 
+An example csv file is shown below:
+
+```csv
+## Hello World
+# label: %step%
+# style: shape=%shape%;fillColor=%fill%;strokeColor=%stroke%;
+# namespace: csvimport-
+# connect: {"from":"refs", "to":"id", "invert":true, "style":"curved=0;endArrow=blockThin;endFill=1;"}
+# width: auto
+# height: auto
+# padding: 15
+# ignore: id,shape,fill,stroke,refs
+# nodespacing: 40
+# levelspacing: 100
+# edgespacing: 40
+# layout: auto
+## CSV starts under this line
+id,step,fill,stroke,shape,refs
+1,Hello World,#dae8fc,#6c8ebf,rectangle,
+2,Am I alive?,#fff2cc,#d6b656,rhombus,1
+3,Yes,#d5e8d4,#82b366,ellipse,2
+4,No,#f8cecc,#b85450,ellipse,2
+5,,#fff2cc,#d6b656,mxgraph.basic.smiley,3
+```
+
+This csv file can be imported into draw.io to create a flow chart using the following steps:
+
+> Click on Arrange > Insert > Advanced > CSV.
+
+To learn more about the CSV format, please check the [documentation](https://www.drawio.com/blog/csv-format)
+
+Basically, the csv file has the following sections:
+
+- Configuration section: lines starting with `#` are comments and configuration options.
+- Data section: the first line is the header, and the following lines are the data rows.
+
+In the configuration section, one needs to specify the shape, label and connector styles, how the shapes are connected, and the layout of the diagram. Each line in the configuration must start with a hash (#)
+
+The most important definitions are as follows:
+
+- The label of each shape in this example is an entry in the ‘step’ column, and this variable is indicated by the percentage symbols that surround it: %step%.
+- The style definition includes a shape (specified by the ‘shape’ column in the CSV data), sets the corners of the shape to be rounded, uses a fill and border color defined by the ‘fill’ and ‘stroke’ columns in the CSV data.
+- The connect line in the configuration defines which shapes are connected to the other shapes (from the ‘refs’ column to the ‘id’ column), whether the connector direction is inverted or not, and the style of the connector and the arrows.
+- The node-, level- and edgespacing lines indicate how far apart the shapes (and levels) should be in the diagram.
+- And finally, layout indicates the actual layout of the diagram. This follows the same auto-layout as in Arrange > Layout.
+
+Comments are started with two hashes (##) and are ignored by draw.io. 
+
+In the data section,  each row is one shape in your diagram. The first row of the CSV data is the column ‘titles’ – they are used as variable names in the configuration section and are not displayed in your diagram.
+
+Shapes, connectors and labels can all have different styles – backgrounds, gradients, rounded corners, dashed borders, arrow styles, different fonts, …. To see the available styles, Check
+https://drawio-app.com/shape-styles/ and https://drawio-app.com/connector-styles-and-animations-in-draw-io/.
+
+
+### Make a chart using command line with csv input
+
+draw.io command line can only process draw.io files, so it can't directly convert a csv file into
+a chart. A workaround is to convert the csv file into a draw.io file first, and then use the command line.
+
+To convert the csv file into a draw.io file, one can use python or other programming languages
+to write a script to generate the draw.io file, and then use draw.io command line to convert
+the draw.io file into a png file.
+
+
+## References
+
+- How to install drawio-desktop: https://tomd.xyz/how-i-use-drawio/
+- Use draw.io with gitlab: https://www.drawio.com/blog/gitlab-wiki-integration
+- CSV format for draw.io: https://www.drawio.com/blog/csv-formathttps://drawio-app.com/blog/automatically-create-draw-io-diagrams-from-csv-files/ and https://drawio-app.com/blog/import-from-csv-to-drawio/
